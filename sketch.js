@@ -9,6 +9,8 @@ var backgroundIMG
 
 var enemy, enemyGroup;
 
+var lastFireTime = 0;
+
 var gameState = "wait";
 var score = 0;
 
@@ -95,7 +97,7 @@ function draw() {
         for(var i=0; i<enemyGroup.length; i++){
             if(player.isTouching(enemyGroup.get(i))){
                 enemyGroup.get(i).remove();
-                health -= 150;
+                health -= 100;
             }
         }
 
@@ -115,7 +117,41 @@ function draw() {
         levelWin();
     }
     if(gameState == "level2"){
+        background(backgroundIMG);
         player.visible =true;
+        playerMovement();
+        spawnEnemies();
+        if(keyDown("SPACE")){
+            fireballSpawn();
+            for(var i=0; i<enemyGroup.length; i++){
+                if(fireballGroup.isTouching(enemyGroup.get(i))){
+                    enemyGroup.get(i).remove();
+                    fireballGroup.destroyEach();
+                    score += 25;
+                }
+            }
+        }
+        for(var i=0; i<enemyGroup.length; i++){
+            if(player.isTouching(enemyGroup.get(i))){
+                enemyGroup.get(i).remove();
+                health -= 150;
+            }
+        }
+
+        if(score == 100){
+            gameState = "gamewin";
+            enemyGroup.destroyEach();
+            player.visible = false;
+            fireballGroup.destroyEach();
+        }
+
+        if(health == 0){
+            gameState = "gamelost";
+            enemyGroup.destroyEach();
+            player.visible = false;
+            fireballGroup.destroyEach();
+        }
+
     }
     if(gameState == "gamelost"){
         score= 0;
@@ -136,6 +172,17 @@ function draw() {
         fill("white");
         text("Score: "+score, windowWidth/1.2, windowHeight/12);
         healthBar();
+    }
+
+    if(gameState == "level1"){
+        textSize(80);
+        fill("white");
+        text("Level 1", windowWidth/2,windowHeight/12);
+    }
+    if(gameState == "level2"){
+        textSize(80);
+        fill("white");
+        text("Level 2", windowWidth/2,windowHeight/12);
     }
    
 
@@ -173,16 +220,15 @@ function spawnEnemies() {
        switch(rand) {
 
         case 1:
-            console.log("lknsdnj")
-            
+           
             enemy.addImage(ufo)
             
             enemy.positionX = windowWidth/2;
             enemy.positionY = windowHeight/2;
-           // enemy.velocityX = Math.round(Math.random()*-5);
-            enemy.velocityY = Math.round(Math.random()*-5); 
+            enemy.velocityX = Math.round(Math.random()*-5);
+            //enemy.velocityY = Math.round(Math.random()*-5); 
             enemy.scale = 0.5;
-            enemy.setLifetime= 1000;
+            enemy.Lifetime= 1000;
             break;
         case 2:
             console.log("2")
@@ -193,7 +239,7 @@ function spawnEnemies() {
             enemy.velocityX = Math.round(Math.random()*-5);
           //  enemy.velocityY = Math.round(Math.random()*-5);
             enemy.scale = 0.5;
-            enemy.setLifetime= 1000;
+            enemy.Lifetime= 1000;
             break;
         case 3:
             enemy.addImage(spaceship3)
@@ -203,17 +249,17 @@ function spawnEnemies() {
            // enemy.velocityY = Math.round(Math.random()*-5);
             enemy.velocityX = Math.round(Math.random()*-5);
             enemy.scale = 0.5;
-            enemy.setLifetime= 1000;
+            enemy.Lifetime= 1000;
             break;
         case 4:
             enemy.addImage(asteroid2)
            
             enemy.positionX = windowWidth/2;
             enemy.positionY = windowHeight/2;
-            enemy.velocityY = Math.round(Math.random()*-5);
-         //   enemy.velocityX = Math.round(Math.random()*-5);
+            //enemy.velocityY = Math.round(Math.random()*-5);
+            enemy.velocityX = Math.round(Math.random()*-5);
             enemy.scale = 1;
-            enemy.setLifetime= 1000;
+            enemy.Lifetime= 1000;
             break;
         default:
            
@@ -270,14 +316,17 @@ function healthBar() {
 }
 
 function fireballSpawn() {
-    
-    
-    fireball = createSprite(player.position.x+20,player.position.y+20)
-    fireball.addImage(fireballImg)
-    fireball.rotation = player.rotation;
-    fireball.setSpeed(speed+10, angle);
-    fireball.setLifetime = 0.00001;
-    fireballGroup.add(fireball);
+    var currentTime = millis();
+    if (currentTime - lastFireTime > 500) {
+        fireball = createSprite(player.position.x+20,player.position.y+20);
+        fireball.addImage(fireballImg);
+        fireball.rotation = player.rotation;
+        fireball.setSpeed(speed+10, angle);
+        fireball.Lifetime = 1000;
+        fireballGroup.add(fireball);
+        
+        lastFireTime = currentTime; // Update last fire time
+    }
 }
 
 function gameWin() {
