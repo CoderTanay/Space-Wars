@@ -42,7 +42,7 @@ function setup() {
     playBtn.size(400,200) ;
     playBtn.hide();
     
-    InfoBtn = createImg("./assets/info.png");
+    InfoBtn = createImg("./assets/Info.png");
     InfoBtn.position(windowWidth/2,windowHeight/2+200);
     InfoBtn.size(400,200);
     InfoBtn.hide();
